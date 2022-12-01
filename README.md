@@ -2,7 +2,7 @@
 
 [_metadata_:name]:- "Nino Casupanan"
 [_metadata_:author]:- "nmcasupanan@medicardphils.com"
----
+----
 
 ## Installation
 - Python 3.10 or latest
@@ -19,6 +19,9 @@ pip3 install -r dependency.txt
 C:Users\> install.bat
 ```
 - You can now use the tool in any project inside your machine.
+```bash
+pyconverter -h
+```
 
 ## Usage
 ### Single convertion
