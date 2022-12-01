@@ -9,13 +9,16 @@ from argparse import ArgumentParser
 import json
 import jpype
 import asposecells
+from .components import getLogger
 
 # This class is only package dependent no special complexity on this class.
 class PyConverter:
+    __class__ = "PyConverter"
     arguments = None
     parser = None
     fileName = None
     encoding = "utf-8-sig"
+    logger = getLogger(__class__)
     
     def __init__(self):
         self.parser = ArgumentParser()
@@ -29,9 +32,10 @@ class PyConverter:
         
     # Check arguments
     def parseArguments(self):
+        
         # Validate arguments
         if len(sys.argv) <= 1:
-            print("No argument passed. Please see -h for argument requirement.")
+            self.logger.critical("No argument passed. Please see -h for argument requirement.")
             exit() # raise Exception("No argument passed. Please see -h for argument requirement.")
 
         # Set expected arguments
@@ -60,15 +64,13 @@ class PyConverter:
         if self.arguments.excel != None:
             return self
         
-        # Clear cli
-        self.cls()
         # For multiple convertion of json to excel
         if self.arguments.json_path != None:
             directory = os.fsencode(self.arguments.json_path)
             dirFiles = os.listdir(directory)
             for file in dirFiles:
                 filename = os.fsdecode(file)
-                print("\nConverting " + filename)
+                self.logger.info("\nConverting " + filename)
                 
                 if filename.endswith(".json"):
                     absFilePath = os.path.join(os.getcwd(), self.arguments.json_path, filename)
@@ -76,6 +78,10 @@ class PyConverter:
                         # set the name for multiple json convertion
                         self.fileName = filename.split(".")[0]
                         self.arguments.name = self.fileName
+                        
+                        # Force path to be the directory path.
+                        if (self.arguments.path != None):
+                            self.arguments.json_path = None
                         
                         # Set the json path
                         self.arguments.json = absFilePath
@@ -99,10 +105,15 @@ class PyConverter:
     
     # Convertion of the json
     def runConvertion(self):
+        dirPath = str(self.arguments.json_path if self.arguments.json_path != None else self.arguments.path)
         if self.arguments.name != None:
-            filePath = str(self.arguments.json_path if self.arguments.json_path != None else self.arguments.path) + self.arguments.name + '.xlsx'
+            filePath = os.path.join(dirPath, self.arguments.name + '.xlsx')
         else:
-            filePath = str(self.arguments.json_path if self.arguments.json_path != None else self.arguments.path) + '%s-extraction.xlsx' % self.fileName
+            filePath = os.path.join(dirPath, '%s-extraction.xlsx' % self.fileName)
+            
+        #
+        if not os.path.exists(dirPath):
+            os.makedirs(dirPath)
         
         # For generating excel with multiple sheet
         if self.arguments.format == "dataframe":
@@ -135,13 +146,13 @@ class PyConverter:
             # Close the Pandas Excel writer and output the Excel file.
             writer.close()
         
-        print("Convertion completed. File: " + filePath)
+        self.logger.info("Convertion completed. File: " + filePath)
         
     def convertExcel2Json(self):
         jpype.startJVM()
         from asposecells.api import Workbook, License
         
-        print("Converting to json " + self.arguments.excel)
+        self.logger.info("Converting to json " + self.arguments.excel)
         # load Excel file
         workbook = Workbook(self.arguments.excel)
 
