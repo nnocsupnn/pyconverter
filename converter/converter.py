@@ -116,7 +116,7 @@ class PyConverter:
             os.makedirs(dirPath)
         
         # For generating excel with multiple sheet
-        if self.arguments.format == "dataframe":
+        if self.arguments.format != "dataframe":
             writer = pandas.ExcelWriter(filePath, engine='xlsxwriter')
         
             # For bigger JSON size.
