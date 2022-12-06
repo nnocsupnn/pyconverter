@@ -80,7 +80,7 @@ class PyConverter:
                         self.arguments.name = self.fileName
                         
                         # Force path to be the directory path.
-                        if (self.arguments.path != None):
+                        if (self.arguments.path != None and self.arguments.json_path == None):
                             self.arguments.json_path = None
                         
                         # Set the json path
@@ -111,6 +111,7 @@ class PyConverter:
         else:
             filePath = os.path.join(dirPath, '%s-extraction.xlsx' % self.fileName)
             
+        print(self.arguments.json_path)
         #
         if not os.path.exists(dirPath):
             os.makedirs(dirPath)
